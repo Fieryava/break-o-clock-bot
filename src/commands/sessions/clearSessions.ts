@@ -17,6 +17,6 @@ export default class ClearSessionsCommand extends Command {
 
   run(message: CommandoMessage): CommandReturn {
     clearSessions();
-    return message.say(`Cleared sessions. Remaining sessions: ${sessionLength}.`);
+    return message.say(`Cleared sessions. Remaining sessions: ${sessionLength()}.`);
   }
 }
