@@ -19,6 +19,6 @@ export default class SessionStatusesCommand extends Command {
 
   run(message: CommandoMessage): CommandReturn {
     const statuses = sessionStatuses();
-    return message.say(`Session statuses:${statuses.map((status, i) => `\n#${i + 1}\nWork time: ${status.workTime}\nBreak time: ${status.breakTime}\nOn break? ${status.isOnBreak}\nParticipants: ${status.participants}`)}`);
+    return message.say(`Session statuses:${statuses.map((status, i) => `\n#${i + 1}\nWork time: ${status.workTime} minutes\nBreak time: ${status.breakTime} minutes\nOn break? ${status.isOnBreak}\nParticipants: ${status.participants}`)}`);
   }
 }
