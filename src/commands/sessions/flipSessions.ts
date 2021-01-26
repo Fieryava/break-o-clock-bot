@@ -6,6 +6,9 @@ export default class FlipSessionsCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {
       name: "flip",
+      aliases: [
+        "flipsessions",
+      ],
       group: "sessions",
       memberName: "flip",
       description: "Flips all existing work sessions.",

@@ -6,6 +6,9 @@ export default class ClearSessionsCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {
       name: "clearsessions",
+      aliases: [
+        "clear",
+      ],
       group: "sessions",
       memberName: "clear",
       description: "Clears all existing work sessions.",

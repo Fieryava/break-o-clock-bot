@@ -7,6 +7,9 @@ export default class JoinSessionCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {
       name: "join",
+      aliases: [
+        "joinsession",
+      ],
       group: "sessions",
       memberName: "join",
       description: "Join someone's existing session.",

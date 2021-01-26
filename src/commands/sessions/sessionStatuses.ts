@@ -6,6 +6,11 @@ export default class SessionStatusesCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {
       name: "sessionstatuses",
+      aliases: [
+        "statuses",
+        "status",
+        "sessionstatus",
+      ],
       group: "sessions",
       memberName: "statuses",
       description: "Gets the status for every session.",

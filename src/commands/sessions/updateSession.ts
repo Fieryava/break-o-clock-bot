@@ -7,6 +7,9 @@ export default class UpdateSessionCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {
       name: "update",
+      aliases: [
+        "updatesession",
+      ],
       group: "sessions",
       memberName: "update",
       description: "Updates your existing work session",

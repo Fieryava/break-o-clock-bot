@@ -7,6 +7,11 @@ export default class StartSessionCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {
       name: "start",
+      aliases: [
+        "startsession",
+        "begin",
+        "beginsession",
+      ],
       group: "sessions",
       memberName: "start",
       description: "Starts a new work session",

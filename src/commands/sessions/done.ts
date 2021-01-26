@@ -6,6 +6,13 @@ export default class DoneCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {
       name: "done",
+      aliases: [
+        "complete",
+        "end",
+        "finish",
+        "exit",
+        "leave",
+      ],
       group: "sessions",
       memberName: "done",
       description: "Removes you from your session.",
