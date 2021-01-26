@@ -1,0 +1,25 @@
+{
+  "name": "break-o-clock-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "built/index.js",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "discord.js-commando": "github:discordjs/Commando",
+    "dotenv": "^8.2.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.14.0",
+    "@typescript-eslint/parser": "^4.14.0",
+    "@types/node": "^14.14.22",
+    "eslint": "^7.18.0",
+    "typescript": "^4.1.3"
+  },
+  "scripts": {
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo \"Build starting\" && tsc && echo \"Build complete\""
+  },
+  "author": "Chill Grill",
+  "license": "ISC"
+}

@@ -1,0 +1,19 @@
+import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
+import { CommandReturn } from "../../common/commands";
+import { flipSessions } from "../../common/sessions/sessionManager";
+
+export default class FlipSessionsCommand extends Command {
+  constructor(client: CommandoClient) {
+    super(client, {
+      name: "flip",
+      group: "sessions",
+      memberName: "flip",
+      description: "Flips all existing work sessions.",
+    });
+  }
+
+  run(message: CommandoMessage): CommandReturn {
+    flipSessions();
+    return message.say("Flipped all sessions!");
+  }
+}

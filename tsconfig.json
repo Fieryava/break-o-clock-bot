@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "outDir": "./built",
+    "allowJs": true,
+    "target": "ES6",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "lib": ["ES5", "ES6", "ES2016"],
+    "resolveJsonModule": true
+  },
+  "include": ["./src/**/*"]
+}
