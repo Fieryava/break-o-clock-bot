@@ -2,6 +2,7 @@
 // TODO: Snooze break time or work time.
 // TODO: More messages to users.
 import { DMChannel, NewsChannel, TextChannel, User } from "discord.js";
+import { getRandomItem } from "../utils";
 
 export interface SessionInputs {
   workTime: number,
@@ -23,6 +24,28 @@ export default class Session {
   // TODO: Add isPaused
   // TODO: Add targetTimestamp
   // TODO: Add remainingTime
+
+  private get participantsString(): string {
+    return this.participants.join(", ");
+  }
+
+  private get breakString(): string {
+    const vals = [
+      `${this.participantsString}, it's break o'clock! ${this.breakTime} minutes before you get back to work.`,
+      `Hey ${this.participantsString}, it's break o'clock! You've got ${this.breakTime} minutes to be free!`,
+    ];
+
+    return getRandomItem(vals);
+  }
+
+  private get workString(): string {
+    const vals = [
+      `${this.participantsString}, time to get back to work :( ${this.workTime} minutes until your next break.`,
+      `${this.participantsString}, back to the grind for ${this.workTime} minutes.`,
+    ];
+
+    return getRandomItem(vals);
+  }
 
   constructor({ channel, workTime, breakTime, participants }: SessionParameters) {
     this.channel = channel;
@@ -72,14 +95,11 @@ export default class Session {
   }
 
   timeUp(): void {
-    if (this.isOnBreak) {
-      this.channel.send(`${this.participants}, time to get back to work :(`);
-      this.start(this.workTime);
-    }
-    else {
-      this.channel.send(`${this.participants}, it's break o'clock!`);
-      this.start(this.breakTime);
-    }
+    const nextTime = this.isOnBreak ? this.workTime : this.breakTime;
+    const messageString = this.isOnBreak ? this.breakString : this.workString;
+
+    this.channel.send(messageString);
+    this.start(nextTime);
     this.isOnBreak = !this.isOnBreak;
   }
 
