@@ -4,7 +4,7 @@ dotenv.config();
 import { CommandoClient } from "discord.js-commando";
 import path = require("path");
 
-import { prefix } from "../config.json";
+import { prefix } from "./config.json";
 
 const client = new CommandoClient({
   commandPrefix: prefix,
