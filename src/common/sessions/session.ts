@@ -25,7 +25,7 @@ export default class Session {
   // TODO: Add targetTimestamp
   // TODO: Add remainingTime
 
-  private get participantsString(): string {
+  get participantsString(): string {
     return this.participants.join(", ");
   }
 
