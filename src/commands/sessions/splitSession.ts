@@ -1,0 +1,27 @@
+import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
+import { CommandReturn } from "../../common/commands";
+import Session from "../../common/sessions/session";
+import { startSession, sessionStatuses } from "../../common/sessions/sessionManager";
+
+export default class SplitSessionCommand extends Command {
+  constructor(client: CommandoClient) {
+    super(client, {
+      name: "split",
+      aliases: [
+        "splitsession",
+      ],
+      group: "sessions",
+      memberName: "split",
+      description: "Splits you into your own session while keeping existing settings.",
+    });
+  }
+
+  run(message: CommandoMessage): CommandReturn {
+    const existingSession = sessionStatuses().find(session => session.participants.includes(message.author));
+    if (existingSession) {
+      startSession(new Session({ channel: message.channel, workTime: existingSession.workTime, breakTime: existingSession.breakTime, participants: [message.author] }));
+      return message.say("Split you to your own session.");
+    }
+    return message.say("No session to split you from; try starting a session first.");
+  }
+}
