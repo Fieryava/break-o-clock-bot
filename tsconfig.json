@@ -6,7 +6,8 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "lib": ["ES5", "ES6", "ES2016"],
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "sourceMap": true
   },
   "include": ["./src/**/*"]
 }
