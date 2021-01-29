@@ -1,6 +1,6 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { CommandReturn } from "../../common/commands";
-import { sessionStatuses } from "../../common/sessions/sessionManager";
+import { getSession } from "../../common/sessions/sessionManager";
 
 export default class UnpauseSessionCommand extends Command {
   constructor(client: CommandoClient) {
@@ -18,7 +18,7 @@ export default class UnpauseSessionCommand extends Command {
   }
 
   run(message: CommandoMessage): CommandReturn {
-    const targetSession = sessionStatuses().get(message.author);
+    const targetSession = getSession(message.author);
     if (targetSession) {
       targetSession.unpause();
       return message.say("Unpaused session!");

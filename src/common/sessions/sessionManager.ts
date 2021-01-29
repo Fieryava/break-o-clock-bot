@@ -12,6 +12,7 @@ const removeFromSessions = (participants: Set<User>) => {
   });
 };
 
+export const getSession = (user: User): Session => sessions.get(user);
 export const sessionStatuses = (): Set<Session> => new Set(sessions.values());
 export const sessionLength = (): number => sessions.size;
 
