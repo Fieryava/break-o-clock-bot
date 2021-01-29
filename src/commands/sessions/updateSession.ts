@@ -1,7 +1,7 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { startSession } from "../../common/sessions/sessionManager";
-import Session, { SessionParameters } from "../../common/sessions/session";
-import { CommandReturn } from "../../common/commands";
+import Session, { SessionInputs } from "../../common/sessions/session";
+import { breakMinutesArg, CommandReturn, participantsArg, workMinutesArg } from "../../common/commands";
 
 export default class UpdateSessionCommand extends Command {
   constructor(client: CommandoClient) {
@@ -14,27 +14,14 @@ export default class UpdateSessionCommand extends Command {
       memberName: "update",
       description: "Updates your existing work session",
       args: [
-        {
-          key: "workMinutes",
-          type: "integer",
-          prompt: "How many minutes will you work for?",
-        },
-        {
-          key: "breakMinutes",
-          type: "integer",
-          prompt: "How many minutes will you take a break for?",
-        },
-        {
-          key: "participants",
-          type: "user",
-          prompt: "Is anyone joining you?",
-          infinite: true,
-        },
+        workMinutesArg,
+        breakMinutesArg,
+        participantsArg,
       ],
     });
   }
 
-  run(message: CommandoMessage, { workMinutes, breakMinutes, participants }: SessionParameters): CommandReturn {
+  run(message: CommandoMessage, { workMinutes, breakMinutes, participants }: SessionInputs): CommandReturn {
     startSession(new Session({ channel: message.channel, workMinutes, breakMinutes, participants }));
     return message.say("Updated your session!");
   }
