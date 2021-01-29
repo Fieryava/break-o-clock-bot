@@ -17,7 +17,7 @@ export default class SplitSessionCommand extends Command {
   }
 
   run(message: CommandoMessage): CommandReturn {
-    const existingSession = sessionStatuses().find(session => session.participants.includes(message.author));
+    const existingSession = sessionStatuses().find(session => session.participants.has(message.author));
     if (existingSession) {
       startSession(new Session({ channel: message.channel, workMinutes: existingSession.workMinutes, breakMinutes: existingSession.breakMinutes, participants: [message.author] }));
       return message.say("Split you to your own session.");

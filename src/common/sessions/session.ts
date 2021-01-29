@@ -3,12 +3,13 @@
 // TODO: More messages to users.
 // TODO: Consider supporting multiple time units. Could use a union type of strings "s" | "m" | "h".
 import { DMChannel, NewsChannel, TextChannel, User } from "discord.js";
+import { difference } from "../sets";
 import { getRandomItem, millisecondsToMinutes, minutesToMilliseconds, minutesToStatus } from "../utils";
 
 export interface SessionInputs {
   workMinutes: number,
   breakMinutes: number,
-  participants: User[],
+  participants: Set<User> | User[],
 }
 
 export interface SessionParameters extends SessionInputs {
@@ -27,7 +28,7 @@ export default class Session {
   get breakMinutes(): number {
     return millisecondsToMinutes(this.breakTime);
   }
-  participants: User[];
+  participants: Set<User>;
   isOnBreak: boolean;
   private timeout: NodeJS.Timeout;
   isPaused: boolean;
@@ -41,7 +42,7 @@ export default class Session {
   }
 
   get participantsString(): string {
-    return this.participants.join(", ");
+    return [...this.participants].join(", ");
   }
 
   private get breakString(): string {
@@ -67,7 +68,7 @@ export default class Session {
     this.workTime = minutesToMilliseconds(workMinutes);
     this.breakTime = minutesToMilliseconds(breakMinutes);
     // TODO: Consider using a set for participants.
-    this.participants = participants;
+    this.participants = new Set(participants);
     this.isOnBreak = false;
     this.start(this.workTime);
   }
@@ -75,8 +76,8 @@ export default class Session {
   update({ workMinutes, breakMinutes, participants }: SessionInputs): void {
     this.workTime = minutesToMilliseconds(workMinutes);
     this.breakTime = minutesToMilliseconds(breakMinutes);
-    this.participants = participants;
-    this.clear();
+    this.participants = new Set(participants);
+    this.stop();
     this.start(this.workTime);
   }
 
@@ -99,17 +100,17 @@ export default class Session {
     // TODO: Handle restarting timer using remaining time when paused.
   }
 
-  clear(): void {
+  stop(): void {
     clearTimeout(this.timeout);
   }
 
   end(): void {
-    this.clear();
-    this.participants = [];
+    this.stop();
+    this.participants.clear();
   }
 
-  removeParticipants(participantsToRemove: User[]): void {
-    this.participants = this.participants.filter(participant => !participantsToRemove.includes(participant));
+  removeParticipants(participantsToRemove: Set<User>): void {
+    this.participants = difference(this.participants, participantsToRemove);
   }
 
   timeUp(): void {
@@ -123,7 +124,7 @@ export default class Session {
   }
 
   flip(): void {
-    this.clear();
+    this.stop();
     this.timeUp();
   }
 }

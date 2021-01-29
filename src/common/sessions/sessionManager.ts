@@ -4,11 +4,11 @@ import Session from "./session";
 // TODO: Consider using a set for sessions. Maybe a dictionary would be better with users as keys. A session could have multiple entries under each user's key.
 let sessions: Session[] = [];
 
-const removeFromSessions = (participants: User[]) => {
+const removeFromSessions = (participants: Set<User>) => {
   sessions = sessions.filter(session => {
     // Remove participants from any sessions they're currently in.
     session.removeParticipants(participants);
-    if (session.participants.length === 0) {
+    if (session.participants.size === 0) {
       // End and remove any session with no participants.
       session.end();
       return false;
@@ -35,15 +35,15 @@ export const flipSessions = (): void => {
 };
 
 export const leaveSessions = (participant: User): void => {
-  removeFromSessions([participant]);
+  removeFromSessions(new Set([participant]));
 };
 
-export const joinSession = (participant: User, target: User): boolean => {
+export const joinSession = (participant: User, targetUser: User): boolean => {
   // TODO: Remove and add in one loop.
-  removeFromSessions([participant]);
-  const targetSession = sessions.find(session => session.participants.includes(target));
+  removeFromSessions(new Set([participant]));
+  const targetSession = sessions.find(session => session.participants.has(targetUser));
   if (targetSession) {
-    targetSession.participants.push(participant);
+    targetSession.participants.add(participant);
     return true;
   }
   return false;
