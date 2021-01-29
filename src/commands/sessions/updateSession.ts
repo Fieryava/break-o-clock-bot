@@ -15,12 +15,12 @@ export default class UpdateSessionCommand extends Command {
       description: "Updates your existing work session",
       args: [
         {
-          key: "workTime",
+          key: "workMinutes",
           type: "integer",
           prompt: "How many minutes will you work for?",
         },
         {
-          key: "breakTime",
+          key: "breakMinutes",
           type: "integer",
           prompt: "How many minutes will you take a break for?",
         },
@@ -34,8 +34,8 @@ export default class UpdateSessionCommand extends Command {
     });
   }
 
-  run(message: CommandoMessage, { workTime, breakTime, participants }: SessionParameters): CommandReturn {
-    startSession(new Session({ channel: message.channel, workTime, breakTime, participants }));
+  run(message: CommandoMessage, { workMinutes, breakMinutes, participants }: SessionParameters): CommandReturn {
+    startSession(new Session({ channel: message.channel, workMinutes, breakMinutes, participants }));
     return message.say("Updated your session!");
   }
 }

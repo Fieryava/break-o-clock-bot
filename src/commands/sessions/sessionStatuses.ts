@@ -2,12 +2,16 @@ import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { CommandReturn } from "../../common/commands";
 import Session from "../../common/sessions/session";
 import { sessionStatuses } from "../../common/sessions/sessionManager";
+import { minutesToStatus } from "../../common/utils";
 
 const statusSeparator = "\n==============================\n";
+
 const statusMessage = (session: Session) => {
-  return `Work time: ${session.workTime} minutes
-Break time: ${session.breakTime} minutes
+  return `Work time: ${session.workMinutes} minutes
+Break time: ${session.breakMinutes} minutes
 On break? ${session.isOnBreak}
+Paused? ${session.isPaused}
+Remaining time: ${minutesToStatus(session.remainingMinutes)} until ${session.isOnBreak ? "work time." : "break time."}
 Participants: ${session.participantsString}`;
 };
 
@@ -16,6 +20,7 @@ const statusMap = (sessions: Session[]) => {
     `#${i + 1}\n${statusMessage(session)}`).join(statusSeparator);
 };
 
+// TODO: Don't mention participants on status messages.
 export default class SessionStatusesCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {

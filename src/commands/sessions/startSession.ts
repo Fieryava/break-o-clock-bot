@@ -3,6 +3,7 @@ import { startSession, sessionLength } from "../../common/sessions/sessionManage
 import Session, { SessionInputs } from "../../common/sessions/session";
 import { CommandReturn } from "../../common/commands";
 
+// TODO: Create arguments as reusable variables.
 export default class StartSessionCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {
@@ -17,13 +18,13 @@ export default class StartSessionCommand extends Command {
       description: "Starts a new work session",
       args: [
         {
-          key: "workTime",
+          key: "workMinutes",
           type: "integer",
           prompt: "How many minutes will you work for?",
           default: 45,
         },
         {
-          key: "breakTime",
+          key: "breakMinutes",
           type: "integer",
           prompt: "How many minutes will you take a break for?",
           default: 15,
@@ -39,8 +40,8 @@ export default class StartSessionCommand extends Command {
     });
   }
 
-  run(message: CommandoMessage, { workTime, breakTime, participants }: SessionInputs): CommandReturn {
-    startSession(new Session({ channel: message.channel, workTime, breakTime, participants }));
+  run(message: CommandoMessage, { workMinutes, breakMinutes, participants }: SessionInputs): CommandReturn {
+    startSession(new Session({ channel: message.channel, workMinutes, breakMinutes, participants }));
     return message.say(`Starting session #${sessionLength()}!`);
   }
 }
