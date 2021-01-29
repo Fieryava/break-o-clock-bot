@@ -2,32 +2,27 @@ import { User } from "discord.js";
 import Session from "./session";
 
 // TODO: Consider using a set for sessions. Maybe a dictionary would be better with users as keys. A session could have multiple entries under each user's key.
-let sessions: Session[] = [];
+const sessions: Map<User, Session> = new Map<User, Session>();
 
 const removeFromSessions = (participants: Set<User>) => {
-  sessions = sessions.filter(session => {
-    // Remove participants from any sessions they're currently in.
-    session.removeParticipants(participants);
-    if (session.participants.size === 0) {
-      // End and remove any session with no participants.
-      session.end();
-      return false;
-    }
-    return true;
+  participants.forEach(user => {
+    const userSession = sessions.get(user);
+    userSession?.removeParticipants(new Set([user]));
+    sessions.delete(user);
   });
 };
 
-export const sessionStatuses = (): Session[] => sessions;
-export const sessionLength = (): number => sessions.length;
+export const sessionStatuses = (): Set<Session> => new Set(sessions.values());
+export const sessionLength = (): number => sessions.size;
 
 export const startSession = (newSession: Session): void => {
   removeFromSessions(newSession.participants);
-  sessions.push(newSession);
+  newSession.participants.forEach(user => sessions.set(user, newSession));
 };
 
 export const clearSessions = (): void => {
   sessions.forEach(session => session.end());
-  sessions = [];
+  sessions.clear();
 };
 
 export const flipSessions = (): void => {
@@ -39,9 +34,8 @@ export const leaveSessions = (participant: User): void => {
 };
 
 export const joinSession = (participant: User, targetUser: User): boolean => {
-  // TODO: Remove and add in one loop.
   removeFromSessions(new Set([participant]));
-  const targetSession = sessions.find(session => session.participants.has(targetUser));
+  const targetSession = sessions.get(targetUser);
   if (targetSession) {
     targetSession.participants.add(participant);
     return true;

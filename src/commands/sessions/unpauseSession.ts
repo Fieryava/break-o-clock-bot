@@ -18,7 +18,7 @@ export default class UnpauseSessionCommand extends Command {
   }
 
   run(message: CommandoMessage): CommandReturn {
-    const targetSession = sessionStatuses().find(session => session.participants.has(message.author));
+    const targetSession = sessionStatuses().get(message.author);
     if (targetSession) {
       targetSession.unpause();
       return message.say("Unpaused session!");

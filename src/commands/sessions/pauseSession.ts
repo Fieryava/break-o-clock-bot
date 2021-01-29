@@ -16,7 +16,7 @@ export default class PauseSessionCommand extends Command {
   }
 
   run(message: CommandoMessage): CommandReturn {
-    const targetSession = sessionStatuses().find(session => session.participants.has(message.author));
+    const targetSession = sessionStatuses().get(message.author);
     if (targetSession) {
       targetSession.pause();
       return message.say("Paused session!");

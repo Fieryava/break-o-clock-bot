@@ -15,8 +15,8 @@ Remaining time: ${minutesToStatus(session.remainingMinutes)} until ${session.isO
 Participants: ${session.participantsString}`;
 };
 
-const statusMap = (sessions: Session[]) => {
-  return sessions.map((session, i) =>
+const statusMap = (sessions: Set<Session>): string => {
+  return [...sessions].map((session, i) =>
     `#${i + 1}\n${statusMessage(session)}`).join(statusSeparator);
 };
 
