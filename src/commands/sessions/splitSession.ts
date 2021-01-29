@@ -16,6 +16,7 @@ export default class SplitSessionCommand extends Command {
     });
   }
 
+  // TODO: Maintain current time on new session.
   run(message: CommandoMessage): CommandReturn {
     const existingSession = sessionStatuses().find(session => session.participants.has(message.author));
     if (existingSession) {

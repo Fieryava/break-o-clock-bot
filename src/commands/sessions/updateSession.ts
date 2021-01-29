@@ -22,6 +22,8 @@ export default class UpdateSessionCommand extends Command {
   }
 
   run(message: CommandoMessage, { workMinutes, breakMinutes, participants }: SessionInputs): CommandReturn {
+    // TODO: Maintain timer between sessions.
+    // TODO: Consider not allowing people add others to sessions.
     startSession(new Session({ channel: message.channel, workMinutes, breakMinutes, participants }));
     return message.say("Updated your session!");
   }

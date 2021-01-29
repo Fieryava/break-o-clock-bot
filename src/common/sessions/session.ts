@@ -1,6 +1,3 @@
-// TODO: How much time is left in a session.
-// TODO: Snooze break time or work time.
-// TODO: More messages to users.
 // TODO: Consider supporting multiple time units. Could use a union type of strings "s" | "m" | "h".
 import { DMChannel, NewsChannel, TextChannel, User } from "discord.js";
 import { difference } from "../sets";
@@ -18,6 +15,8 @@ export interface SessionParameters extends SessionInputs {
 
 // TODO: Snooze
 // TODO: More minimalist messaging. Messages and commands for every function is cumbersome and noisy.
+// TODO: Consider reacting to commands instead of doing response messages.
+// TODO: Consider allowing users to join sessions with reactions.
 export default class Session {
   channel: TextChannel | DMChannel | NewsChannel;
   private workTime: number;
@@ -77,8 +76,6 @@ export default class Session {
     this.workTime = minutesToMilliseconds(workMinutes);
     this.breakTime = minutesToMilliseconds(breakMinutes);
     this.participants = new Set(participants);
-    this.stop();
-    this.start(this.workTime);
   }
 
   /**
@@ -93,11 +90,15 @@ export default class Session {
   }
 
   pause(): void {
-    // TODO: Calculate remaining time.
+    if (this.isPaused) return;
+    this.isPaused = true;
+    this.remainingTime = this.targetTime - Date.now();
+    this.stop();
   }
 
   unpause(): void {
-    // TODO: Handle restarting timer using remaining time when paused.
+    if (!this.isPaused) return;
+    this.start(this.remainingTime);
   }
 
   stop(): void {
