@@ -1,5 +1,6 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { CommandReturn } from "../../common/commands";
+import { play } from "../../common/emojis";
 import { getSession } from "../../common/sessions/sessionManager";
 
 export default class UnpauseSessionCommand extends Command {
@@ -19,11 +20,10 @@ export default class UnpauseSessionCommand extends Command {
 
   run(message: CommandoMessage): CommandReturn {
     const targetSession = getSession(message.author);
-    if (targetSession) {
-      targetSession.unpause();
-      return message.say("Unpaused session!");
-    }
+    if (!targetSession) return message.say("Couldn't find a session to unpause.");
 
-    return message.say("Couldn't find a session to unpause.");
+    targetSession.unpause();
+    message.react(play);
+    return;
   }
 }
