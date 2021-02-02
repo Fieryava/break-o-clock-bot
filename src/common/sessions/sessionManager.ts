@@ -3,10 +3,14 @@ import Session from "./session";
 
 const sessions: Map<string, Session> = new Map();
 
-const removeFromSessions = (participants: Set<User>) => {
-  participants.forEach(user => {
+const removeFromSessions = (participants: Map<string, User> | User[] | User) => {
+  if ("id" in participants) {
+    participants = [participants];
+  }
+
+  participants.forEach((user: User) => {
     const userSession = sessions.get(user.id);
-    userSession?.removeParticipants(new Set([user]));
+    userSession?.removeParticipants(user);
     if (userSession?.participants.size === 0) userSession?.end();
     sessions.delete(user.id);
   });
@@ -31,14 +35,14 @@ export const flipSessions = (): void => {
 };
 
 export const leaveSessions = (participant: User): void => {
-  removeFromSessions(new Set([participant]));
+  removeFromSessions(participant);
 };
 
 export const joinSession = (participant: User, targetUser: User): boolean => {
-  removeFromSessions(new Set([participant]));
+  removeFromSessions(participant);
   const targetSession = sessions.get(targetUser.id);
   if (targetSession) {
-    targetSession.participants.add(participant);
+    targetSession.addParticipants(participant);
     return true;
   }
   return false;
