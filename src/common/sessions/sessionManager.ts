@@ -7,6 +7,7 @@ const removeFromSessions = (participants: Set<User>) => {
   participants.forEach(user => {
     const userSession = sessions.get(user.id);
     userSession?.removeParticipants(new Set([user]));
+    if (userSession?.participants.size === 0) userSession?.end();
     sessions.delete(user.id);
   });
 };
