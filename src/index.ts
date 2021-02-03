@@ -28,4 +28,4 @@ client.once("ready", () => {
 
 client.on("error", console.error);
 
-client.login(process.env.TOKEN);
+client.login(process.env.DISCORD_TOKEN);
