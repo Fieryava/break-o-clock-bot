@@ -40,7 +40,7 @@ export default class Session {
   }
 
   get participantsString(): string {
-    return [...this.participants].join(", ");
+    return [...this.participants.values()].join(", ");
   }
 
   private get breakString(): string {
