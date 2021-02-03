@@ -1,6 +1,7 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { CommandReturn } from "../../common/commands";
-import { clearSessions, sessionLength } from "../../common/sessions/sessionManager";
+import { okHand } from "../../common/emojis";
+import { clearSessions } from "../../common/sessions/sessionManager";
 
 export default class ClearSessionsCommand extends Command {
   constructor(client: CommandoClient) {
@@ -17,6 +18,7 @@ export default class ClearSessionsCommand extends Command {
 
   run(message: CommandoMessage): CommandReturn {
     clearSessions();
-    return message.say(`Cleared sessions. Remaining sessions: ${sessionLength()}.`);
+    message.react(okHand);
+    return;
   }
 }

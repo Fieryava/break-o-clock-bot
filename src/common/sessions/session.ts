@@ -1,12 +1,11 @@
 // TODO: Consider supporting multiple time units. Could use a union type of strings "s" | "m" | "h".
 import { DMChannel, NewsChannel, TextChannel, User } from "discord.js";
-import { difference } from "../sets";
 import { getRandomItem, millisecondsToMinutes, minutesToMilliseconds, minutesToStatus } from "../utils";
 
 export interface SessionInputs {
   workMinutes: number,
   breakMinutes: number,
-  participants: Set<User> | User[],
+  participants: User[],
 }
 
 export interface SessionParameters extends SessionInputs {
@@ -27,7 +26,7 @@ export default class Session {
   get breakMinutes(): number {
     return millisecondsToMinutes(this.breakTime);
   }
-  participants: Set<User>;
+  participants: Map<string, User>;
   isOnBreak: boolean;
   private timeout: NodeJS.Timeout;
   isPaused: boolean;
@@ -41,7 +40,7 @@ export default class Session {
   }
 
   get participantsString(): string {
-    return [...this.participants].join(", ");
+    return [...this.participants.values()].join(", ");
   }
 
   private get breakString(): string {
@@ -66,8 +65,8 @@ export default class Session {
     this.channel = channel;
     this.workTime = minutesToMilliseconds(workMinutes);
     this.breakTime = minutesToMilliseconds(breakMinutes);
-    // TODO: Consider using a set for participants.
-    this.participants = new Set(participants);
+    this.participants = new Map();
+    this.addParticipants(participants);
     this.isOnBreak = false;
     this.start(this.workTime);
   }
@@ -75,7 +74,8 @@ export default class Session {
   update({ workMinutes, breakMinutes, participants }: SessionInputs): void {
     this.workTime = minutesToMilliseconds(workMinutes);
     this.breakTime = minutesToMilliseconds(breakMinutes);
-    this.participants = new Set(participants);
+    this.participants.clear();
+    this.addParticipants(participants);
   }
 
   /**
@@ -110,8 +110,16 @@ export default class Session {
     this.participants.clear();
   }
 
-  removeParticipants(participantsToRemove: Set<User>): void {
-    this.participants = difference(this.participants, participantsToRemove);
+  addParticipants(participants: User[] | User): void {
+    if ("id" in participants) participants = [participants];
+
+    participants.forEach((participant: User) => this.participants.set(participant.id, participant));
+  }
+
+  removeParticipants(participants: User[] | User): void {
+    if ("id" in participants) participants = [participants];
+
+    participants.forEach((participant: User) => this.participants.delete(participant.id));
   }
 
   timeUp(): void {

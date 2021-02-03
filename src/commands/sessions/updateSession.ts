@@ -2,6 +2,7 @@ import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { startSession } from "../../common/sessions/sessionManager";
 import Session, { SessionInputs } from "../../common/sessions/session";
 import { breakMinutesArg, CommandReturn, participantsArg, workMinutesArg } from "../../common/commands";
+import { okHand } from "../../common/emojis";
 
 export default class UpdateSessionCommand extends Command {
   constructor(client: CommandoClient) {
@@ -25,6 +26,7 @@ export default class UpdateSessionCommand extends Command {
     // TODO: Maintain timer between sessions.
     // TODO: Consider not allowing people add others to sessions.
     startSession(new Session({ channel: message.channel, workMinutes, breakMinutes, participants }));
-    return message.say("Updated your session!");
+    message.react(okHand);
+    return;
   }
 }
