@@ -43,6 +43,7 @@ export const joinSession = (participant: User, targetUser: User): boolean => {
   const targetSession = sessions.get(targetUser.id);
   if (targetSession) {
     targetSession.addParticipants(participant);
+    sessions.set(participant.id, targetSession);
     return true;
   }
   return false;
