@@ -6,9 +6,9 @@ import { getSession } from "../../common/sessions/sessionManager";
 export default class SessionStatusCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {
-      name: "sessionstatus",
+      name: "status",
       aliases: [
-        "status",
+        "sessionstatus",
       ],
       group: "sessions",
       memberName: "status",
