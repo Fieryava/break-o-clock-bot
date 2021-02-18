@@ -5,3 +5,5 @@ export const axe = "🪓";
 export const pinchingHand = "🤏";
 export const handshake = "🤝";
 export const peaceHand = "✌️";
+export const timerEmoji = "⏲️";
+export const flipEmoji = "🔄";
