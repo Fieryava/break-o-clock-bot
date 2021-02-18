@@ -158,11 +158,9 @@ export default class Session {
   }
 
   toString(): string {
-    return `Work time: ${this.workMinutes} minutes
-Break time: ${this.breakMinutes} minutes
-On break? ${this.isOnBreak}
-Paused? ${this.isPaused}
-Remaining time: ${minutesToStatus(this.remainingMinutes)} until ${this.isOnBreak ? "work time." : "break time."}
+    return `${this.isPaused ? "Paused. " : ""}${minutesToStatus(this.remainingMinutes)} until ${this.isOnBreak ? "work time." : "break time."}
+Work time: ${this.workMinutes} min
+Break time: ${this.breakMinutes} min
 Participants: ${this.participantsString}`;
   }
   // #endregion
