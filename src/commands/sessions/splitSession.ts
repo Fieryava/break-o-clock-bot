@@ -22,7 +22,7 @@ export default class SplitSessionCommand extends Command {
     const existingSession = getSession(message.author);
     if (!existingSession) return message.say("No session to split you from; try starting a session first.");
 
-    startSession(new Session({ channel: message.channel, workMinutes: existingSession.workMinutes, breakMinutes: existingSession.breakMinutes, participants: [message.author] }));
+    startSession(new Session({ channel: message.channel, workMinutes: existingSession.workMinutes, breakMinutes: existingSession.breakMinutes, participants: [message.author], remainingTime: existingSession.remainingMinutes }));
     message.react(axe);
     return;
   }

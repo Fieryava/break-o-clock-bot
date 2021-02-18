@@ -27,6 +27,7 @@ export const updateSession = (target: Target, workMinutes: number, breakMinutes:
   if (!session) return false;
 
   session.update({ workMinutes, breakMinutes });
+  return true;
 };
 
 export const leaveSession = (participant: User): boolean => {

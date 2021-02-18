@@ -4,13 +4,14 @@ import { getRandomItem, millisecondsToMinutes, minutesToMilliseconds, minutesToS
 
 // #region Interfaces
 export interface SessionInputs {
-  workMinutes: number,
-  breakMinutes: number,
+  workMinutes: number;
+  breakMinutes: number;
 }
 
 export interface SessionParameters extends SessionInputs {
-  participants: User | User[],
+  participants: User | User[];
   channel: TextChannel | DMChannel | NewsChannel;
+  remainingTime?: number;
 }
 // #endregion
 
@@ -70,14 +71,14 @@ export default class Session {
   // #endregion
 
   // #region Constructors and update
-  constructor({ channel, workMinutes, breakMinutes, participants }: SessionParameters) {
+  constructor({ channel, workMinutes, breakMinutes, participants, remainingTime: remainingMinutes = -1 }: SessionParameters) {
     this.channel = channel;
     this.workTime = minutesToMilliseconds(workMinutes);
     this.breakTime = minutesToMilliseconds(breakMinutes);
     this.participants = new Map();
     this.addParticipants(participants);
     this.isOnBreak = false;
-    this.start(this.workTime);
+    this.start(remainingMinutes >= 0 ? minutesToMilliseconds(remainingMinutes) : this.workTime);
   }
 
   update({ workMinutes, breakMinutes }: SessionInputs): void {
