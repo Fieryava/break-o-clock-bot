@@ -1,7 +1,7 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
-import { startSession } from "../../common/sessions/sessionManager";
-import Session, { SessionInputs } from "../../common/sessions/session";
-import { breakMinutesArg, CommandReturn, participantsArg, workMinutesArg } from "../../common/commands";
+import { updateSession } from "../../common/sessions/sessionManager";
+import { SessionInputs } from "../../common/sessions/session";
+import { breakMinutesArg, CommandReturn, workMinutesArg } from "../../common/commands";
 import { okHand } from "../../common/emojis";
 
 export default class UpdateSessionCommand extends Command {
@@ -17,15 +17,13 @@ export default class UpdateSessionCommand extends Command {
       args: [
         workMinutesArg,
         breakMinutesArg,
-        participantsArg,
       ],
     });
   }
 
-  run(message: CommandoMessage, { workMinutes, breakMinutes, participants }: SessionInputs): CommandReturn {
-    // TODO: Maintain timer between sessions.
-    // TODO: Consider not allowing people add others to sessions.
-    startSession(new Session({ channel: message.channel, workMinutes, breakMinutes, participants }));
+  run(message: CommandoMessage, { workMinutes, breakMinutes }: SessionInputs): CommandReturn {
+    if (!updateSession(message.author, workMinutes, breakMinutes)) return message.say("No session to update.");
+
     message.react(okHand);
     return;
   }

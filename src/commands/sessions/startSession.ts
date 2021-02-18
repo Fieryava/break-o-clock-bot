@@ -1,7 +1,7 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { startSession } from "../../common/sessions/sessionManager";
 import Session, { SessionInputs } from "../../common/sessions/session";
-import { breakMinutesArg, CommandReturn, participantsArg, workMinutesArg } from "../../common/commands";
+import { breakMinutesArg, CommandReturn, workMinutesArg } from "../../common/commands";
 import { okHand } from "../../common/emojis";
 
 export default class StartSessionCommand extends Command {
@@ -19,14 +19,13 @@ export default class StartSessionCommand extends Command {
       args: [
         workMinutesArg,
         breakMinutesArg,
-        participantsArg,
       ],
     });
   }
 
   // TODO: Consider sending a message with time for initial timer.
-  run(message: CommandoMessage, { workMinutes, breakMinutes, participants }: SessionInputs): CommandReturn {
-    startSession(new Session({ channel: message.channel, workMinutes, breakMinutes, participants }));
+  run(message: CommandoMessage, { workMinutes, breakMinutes }: SessionInputs): CommandReturn {
+    startSession(new Session({ channel: message.channel, workMinutes, breakMinutes, participants: message.author }));
     message.react(okHand);
     return;
   }

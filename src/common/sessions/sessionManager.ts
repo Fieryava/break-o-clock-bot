@@ -10,14 +10,7 @@ const removeFromSessions = (participants: Map<string, User> | User[] | User) => 
     participants = [participants];
   }
 
-  participants.forEach((user: User) => {
-    const userSession = sessions.get(user.id);
-    if (!userSession) return;
-
-    userSession.removeParticipants(user);
-    sessions.delete(user.id);
-    if (userSession.participants.size === 0) userSession.end();
-  });
+  participants.forEach(leaveSession);
 };
 
 export const getSession = (target: Target): Session => {
@@ -29,8 +22,21 @@ export const startSession = (newSession: Session): void => {
   newSession.participants.forEach(user => sessions.set(user.id, newSession));
 };
 
-export const leaveSession = (participant: User): void => {
-  removeFromSessions(participant);
+export const updateSession = (target: Target, workMinutes: number, breakMinutes: number): boolean => {
+  const session = getSession(target);
+  if (!session) return false;
+
+  session.update({ workMinutes, breakMinutes });
+};
+
+export const leaveSession = (participant: User): boolean => {
+  const userSession = sessions.get(participant.id);
+  if (!userSession) return false;
+
+  userSession.removeParticipants(participant);
+  sessions.delete(participant.id);
+  if (userSession.participants.size === 0) userSession.end();
+  return true;
 };
 
 export const joinSession = (participant: User, target: Target): boolean => {

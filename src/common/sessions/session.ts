@@ -6,10 +6,10 @@ import { getRandomItem, millisecondsToMinutes, minutesToMilliseconds, minutesToS
 export interface SessionInputs {
   workMinutes: number,
   breakMinutes: number,
-  participants: User[],
 }
 
 export interface SessionParameters extends SessionInputs {
+  participants: User | User[],
   channel: TextChannel | DMChannel | NewsChannel;
 }
 // #endregion
@@ -80,11 +80,9 @@ export default class Session {
     this.start(this.workTime);
   }
 
-  update({ workMinutes, breakMinutes, participants }: SessionInputs): void {
+  update({ workMinutes, breakMinutes }: SessionInputs): void {
     this.workTime = minutesToMilliseconds(workMinutes);
     this.breakTime = minutesToMilliseconds(breakMinutes);
-    this.participants.clear();
-    this.addParticipants(participants);
   }
   // #endregion
 

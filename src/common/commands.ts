@@ -16,14 +16,6 @@ export const breakMinutesArg: ArgumentInfo = {
   default: 15,
 };
 
-export const participantsArg: ArgumentInfo = {
-  key: "participants",
-  type: "user",
-  prompt: "Is anyone joining you?",
-  infinite: true,
-  default: (message: CommandoMessage) => [message.author],
-};
-
 export const targetUserArg: ArgumentInfo = {
   key: "targetUser",
   type: "user",
