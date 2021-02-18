@@ -13,6 +13,8 @@ export default class DoneCommand extends Command {
         "finish",
         "exit",
         "leave",
+        "clear",
+        "quit",
       ],
       group: "sessions",
       memberName: "done",
