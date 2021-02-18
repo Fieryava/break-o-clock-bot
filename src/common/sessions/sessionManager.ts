@@ -16,9 +16,11 @@ const removeFromSessions = (participants: Map<string, User> | User[] | User) => 
   });
 };
 
+// #region Session getters
 export const getSession = (user: User): Session => sessions.get(user.id);
 export const sessionStatuses = (): Set<Session> => new Set(sessions.values());
 export const sessionLength = (): number => sessions.size;
+// #endregion
 
 export const startSession = (newSession: Session): void => {
   removeFromSessions(newSession.participants);
@@ -30,21 +32,21 @@ export const clearSessions = (): void => {
   sessions.clear();
 };
 
-export const flipSessions = (): void => {
-  sessions.forEach(session => session.flip());
-};
-
 export const leaveSessions = (participant: User): void => {
   removeFromSessions(participant);
 };
 
-export const joinSession = (participant: User, targetUser: User): boolean => {
+export const joinSession = (participant: User, target: User | Session): boolean => {
   removeFromSessions(participant);
-  const targetSession = sessions.get(targetUser.id);
+  const targetSession = "id" in target ? sessions.get(target.id) : target;
   if (targetSession) {
     targetSession.addParticipants(participant);
     sessions.set(participant.id, targetSession);
     return true;
   }
   return false;
+};
+
+export const flipSessions = (): void => {
+  sessions.forEach(session => session.flip());
 };
