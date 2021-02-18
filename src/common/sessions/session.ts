@@ -2,6 +2,7 @@
 import { DMChannel, NewsChannel, TextChannel, User } from "discord.js";
 import { getRandomItem, millisecondsToMinutes, minutesToMilliseconds, minutesToStatus } from "../utils";
 
+// #region Interfaces
 export interface SessionInputs {
   workMinutes: number,
   breakMinutes: number,
@@ -11,12 +12,12 @@ export interface SessionInputs {
 export interface SessionParameters extends SessionInputs {
   channel: TextChannel | DMChannel | NewsChannel;
 }
+// #endregion
 
 // TODO: Snooze
-// TODO: More minimalist messaging. Messages and commands for every function is cumbersome and noisy.
-// TODO: Consider reacting to commands instead of doing response messages.
 // TODO: Consider allowing users to join sessions with reactions.
 export default class Session {
+  // #region Properties
   channel: TextChannel | DMChannel | NewsChannel;
   private workTime: number;
   get workMinutes(): number {
@@ -38,29 +39,37 @@ export default class Session {
       : this.targetTime - Date.now();
     return millisecondsToMinutes(time);
   }
+  // #endregion
 
+  // #region String getters
   get participantsString(): string {
     return [...this.participants.values()].join(", ");
   }
 
+  private withTextDecorations(input: string): string {
+    return `${this.participantsString}, ${input}`;
+  }
+
   private get breakString(): string {
     const vals = [
-      `${this.participantsString}, it's break o'clock! ${minutesToStatus(this.breakMinutes)} before you get back to work.`,
-      `Hey ${this.participantsString}, it's break o'clock! You've got ${minutesToStatus(this.breakMinutes)} to be free!`,
+      `it's break o'clock! ${minutesToStatus(this.breakMinutes)} before you get back to work.`,
+      `it's break o'clock! You've got ${minutesToStatus(this.breakMinutes)} to be free!`,
     ];
 
-    return getRandomItem(vals);
+    return this.withTextDecorations(getRandomItem(vals));
   }
 
   private get workString(): string {
     const vals = [
-      `${this.participantsString}, time to get back to work :( ${minutesToStatus(this.workMinutes)} until your next break.`,
-      `${this.participantsString}, back to the grind for ${minutesToStatus(this.workMinutes)}.`,
+      `time to get back to work :( ${minutesToStatus(this.workMinutes)} until your next break.`,
+      `back to the grind for ${minutesToStatus(this.workMinutes)}.`,
     ];
 
-    return getRandomItem(vals);
+    return this.withTextDecorations(getRandomItem(vals));
   }
+  // #endregion
 
+  // #region Constructors and update
   constructor({ channel, workMinutes, breakMinutes, participants }: SessionParameters) {
     this.channel = channel;
     this.workTime = minutesToMilliseconds(workMinutes);
@@ -77,7 +86,9 @@ export default class Session {
     this.participants.clear();
     this.addParticipants(participants);
   }
+  // #endregion
 
+  // #region Starting and stopping
   /**
    * Start the timeout using time.
    * @param time The timeout delay in milliseconds.
@@ -109,7 +120,26 @@ export default class Session {
     this.stop();
     this.participants.clear();
   }
+  // #endregion
 
+  // #region Flipping
+  timeUp(): void {
+    this.isOnBreak = !this.isOnBreak;
+
+    const nextTime = this.isOnBreak ? this.breakTime : this.workTime;
+    const messageString = this.isOnBreak ? this.breakString : this.workString;
+
+    this.message(messageString);
+    this.start(nextTime);
+  }
+
+  flip(): void {
+    this.stop();
+    this.timeUp();
+  }
+  // #endregion
+
+  // #region Participants
   addParticipants(participants: User[] | User): void {
     if ("id" in participants) participants = [participants];
 
@@ -121,19 +151,20 @@ export default class Session {
 
     participants.forEach((participant: User) => this.participants.delete(participant.id));
   }
+  // #endregion
 
-  timeUp(): void {
-    this.isOnBreak = !this.isOnBreak;
-
-    const nextTime = this.isOnBreak ? this.breakTime : this.workTime;
-    const messageString = this.isOnBreak ? this.breakString : this.workString;
-
+  // #region User interfacing
+  message(messageString: string): void {
     this.channel.send(messageString);
-    this.start(nextTime);
   }
-
-  flip(): void {
-    this.stop();
-    this.timeUp();
-  }
+  // #endregion
 }
+
+export const statusMessage = (session: Session): string => {
+  return `Work time: ${session.workMinutes} minutes
+Break time: ${session.breakMinutes} minutes
+On break? ${session.isOnBreak}
+Paused? ${session.isPaused}
+Remaining time: ${minutesToStatus(session.remainingMinutes)} until ${session.isOnBreak ? "work time." : "break time."}
+Participants: ${session.participantsString}`;
+};
