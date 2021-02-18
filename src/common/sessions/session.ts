@@ -157,14 +157,14 @@ export default class Session {
   message(messageString: string): void {
     this.channel.send(messageString);
   }
+
+  toString(): string {
+    return `Work time: ${this.workMinutes} minutes
+Break time: ${this.breakMinutes} minutes
+On break? ${this.isOnBreak}
+Paused? ${this.isPaused}
+Remaining time: ${minutesToStatus(this.remainingMinutes)} until ${this.isOnBreak ? "work time." : "break time."}
+Participants: ${this.participantsString}`;
+  }
   // #endregion
 }
-
-export const statusMessage = (session: Session): string => {
-  return `Work time: ${session.workMinutes} minutes
-Break time: ${session.breakMinutes} minutes
-On break? ${session.isOnBreak}
-Paused? ${session.isPaused}
-Remaining time: ${minutesToStatus(session.remainingMinutes)} until ${session.isOnBreak ? "work time." : "break time."}
-Participants: ${session.participantsString}`;
-};

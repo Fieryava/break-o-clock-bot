@@ -1,7 +1,7 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { CommandReturn } from "../../common/commands";
 import { pause } from "../../common/emojis";
-import { getSession } from "../../common/sessions/sessionManager";
+import { pauseSession } from "../../common/sessions/sessionManager";
 
 export default class PauseSessionCommand extends Command {
   constructor(client: CommandoClient) {
@@ -17,10 +17,8 @@ export default class PauseSessionCommand extends Command {
   }
 
   run(message: CommandoMessage): CommandReturn {
-    const targetSession = getSession(message.author);
-    if (!targetSession) return message.say("Couldn't find a session to pause.");
+    if (!pauseSession(message.author)) return message.say("Couldn't find a session to pause.");
 
-    targetSession.pause();
     message.react(pause);
     return;
   }

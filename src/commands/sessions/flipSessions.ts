@@ -1,7 +1,7 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { CommandReturn } from "../../common/commands";
 import { okHand } from "../../common/emojis";
-import { flipSessions } from "../../common/sessions/sessionManager";
+import { flipSession } from "../../common/sessions/sessionManager";
 
 export default class FlipSessionsCommand extends Command {
   constructor(client: CommandoClient) {
@@ -17,7 +17,7 @@ export default class FlipSessionsCommand extends Command {
   }
 
   run(message: CommandoMessage): CommandReturn {
-    flipSessions();
+    flipSession(message.author);
     message.react(okHand);
     return;
   }

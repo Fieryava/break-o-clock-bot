@@ -1,7 +1,7 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { CommandReturn } from "../../common/commands";
 import { peaceHand } from "../../common/emojis";
-import { leaveSessions } from "../../common/sessions/sessionManager";
+import { leaveSession } from "../../common/sessions/sessionManager";
 
 export default class DoneCommand extends Command {
   constructor(client: CommandoClient) {
@@ -21,7 +21,7 @@ export default class DoneCommand extends Command {
   }
 
   run(message: CommandoMessage): CommandReturn {
-    leaveSessions(message.author);
+    leaveSession(message.author);
     message.react(peaceHand);
     return;
   }
