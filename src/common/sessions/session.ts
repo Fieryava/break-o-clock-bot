@@ -1,6 +1,8 @@
 // TODO: Consider supporting multiple time units. Could use a union type of strings "s" | "m" | "h".
-import { DMChannel, NewsChannel, TextChannel, User } from "discord.js";
+import { CollectorFilter, DMChannel, Message, MessageReaction, NewsChannel, ReactionCollector, TextChannel, User } from "discord.js";
+import { axe as splitEmoji, flipEmoji, handshake as joinEmoji, pause as pauseEmoji, peaceHand as doneEmoji, play as unpauseEmoji, timerEmoji } from "../emojis";
 import { getRandomItem, millisecondsToMinutes, minutesToMilliseconds, minutesToStatus } from "../utils";
+import { joinSession, leaveSession, splitSession } from "./sessionManager";
 
 // #region Interfaces
 export interface SessionInputs {
@@ -15,8 +17,8 @@ export interface SessionParameters extends SessionInputs {
 }
 // #endregion
 
+// TODO: Delete previous messages to maintain 1 message per session
 // TODO: Snooze
-// TODO: Consider allowing users to join sessions with reactions.
 export default class Session {
   // #region Properties
   channel: TextChannel | DMChannel | NewsChannel;
@@ -40,6 +42,8 @@ export default class Session {
       : this.targetTime - Date.now();
     return millisecondsToMinutes(time);
   }
+  private message: Message;
+  private collector: ReactionCollector;
   // #endregion
 
   // #region String getters
@@ -118,17 +122,20 @@ export default class Session {
   end(): void {
     this.stop();
     this.participants.clear();
+    this.message?.delete();
+    this.collector.stop("Session ended");
   }
   // #endregion
 
   // #region Flipping
-  timeUp(): void {
+  async timeUp(): Promise<void> {
     this.isOnBreak = !this.isOnBreak;
 
     const nextTime = this.isOnBreak ? this.breakTime : this.workTime;
     const messageString = this.isOnBreak ? this.breakString : this.workString;
 
-    this.message(messageString);
+    await this.sendMessage(messageString);
+    this.reactionHandling();
     this.start(nextTime);
   }
 
@@ -153,12 +160,44 @@ export default class Session {
   // #endregion
 
   // #region User interfacing
-  message(messageString: string): void {
-    this.channel.send(messageString);
+  async sendMessage(messageString: string): Promise<void> {
+    await this.message?.delete();
+    this.message = await this.channel.send(messageString);
   }
 
+  sendStatus(): void {
+    this.sendMessage(this.toString());
+  }
+
+  async reactionHandling(): Promise<void> {
+    const emojiCommands = new Map<string, (user: User) => void>([
+      [unpauseEmoji, () => this.unpause],
+      [pauseEmoji, () => this.pause],
+      [flipEmoji, () => this.flip],
+      [joinEmoji, (user: User) => joinSession(user, this)],
+      [splitEmoji, (user: User) => splitSession(user, this.channel)],
+      [timerEmoji, () => this.sendStatus()],
+      [doneEmoji, (user: User) => leaveSession(user)],
+    ]);
+    for (const [emoji] of emojiCommands) {
+      await this.message.react(emoji);
+    }
+
+    const filter: CollectorFilter = (reaction: MessageReaction) => emojiCommands.has(reaction.emoji.name);
+    const collectorListener = (reaction: MessageReaction, user: User) => {
+      const command = emojiCommands.get(reaction.emoji.name);
+      if (command) command(user);
+    };
+
+    this.collector = this.message.createReactionCollector(filter, { idle: minutesToMilliseconds(60) });
+    this.collector.on("collect", collectorListener);
+    this.collector.on("remove", collectorListener);
+  }
+
+  // TODO: Don't mention participants on status messages.
   toString(): string {
-    return `${this.isPaused ? "Paused. " : ""}${minutesToStatus(this.remainingMinutes)} until ${this.isOnBreak ? "work time." : "break time."}
+    return `Session status:
+${this.isPaused ? "Paused. " : ""}${minutesToStatus(this.remainingMinutes)} until ${this.isOnBreak ? "work" : "break"} time.
 Work time: ${this.workMinutes} min
 Break time: ${this.breakMinutes} min
 Participants: ${this.participantsString}`;
