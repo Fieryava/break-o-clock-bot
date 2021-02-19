@@ -1,4 +1,4 @@
-import { User } from "discord.js";
+import { DMChannel, NewsChannel, TextChannel, User } from "discord.js";
 import Session from "./session";
 
 type Target = User | Session;
@@ -71,5 +71,13 @@ export const unpauseSession = (target: Target): boolean => {
   if (!targetSession) return false;
 
   targetSession.unpause();
+  return true;
+};
+
+export const splitSession = (user: User, channel: TextChannel | DMChannel | NewsChannel): boolean => {
+  const existingSession = getSession(user);
+  if (!existingSession) return false;
+
+  startSession(new Session({ channel, workMinutes: existingSession.workMinutes, breakMinutes: existingSession.breakMinutes, participants: user, remainingTime: existingSession.remainingMinutes }));
   return true;
 };

@@ -1,8 +1,7 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { CommandReturn } from "../../common/commands";
 import { axe } from "../../common/emojis";
-import Session from "../../common/sessions/session";
-import { startSession, getSession } from "../../common/sessions/sessionManager";
+import { splitSession } from "../../common/sessions/sessionManager";
 
 export default class SplitSessionCommand extends Command {
   constructor(client: CommandoClient) {
@@ -19,10 +18,8 @@ export default class SplitSessionCommand extends Command {
 
   // TODO: Maintain current time on new session.
   run(message: CommandoMessage): CommandReturn {
-    const existingSession = getSession(message.author);
-    if (!existingSession) return message.say("No session to split you from; try starting a session first.");
+    if (!splitSession(message.author, message.channel)) return message.say("No session to split you from.");
 
-    startSession(new Session({ channel: message.channel, workMinutes: existingSession.workMinutes, breakMinutes: existingSession.breakMinutes, participants: [message.author], remainingTime: existingSession.remainingMinutes }));
     message.react(axe);
     return;
   }
