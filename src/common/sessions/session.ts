@@ -7,7 +7,10 @@ export interface SessionParams {
 
 export default abstract class Session {
   protected channel: TextChannel | DMChannel | NewsChannel;
-  public users: Map<string, User>;
+  private _users: Map<string, User>;
+  public get users(): Map<string, User> {
+    return this._users;
+  }
 
   protected get usersString(): string {
     return [...this.users.values()].join(", ");
@@ -19,7 +22,7 @@ export default abstract class Session {
 
   public constructor({ channel, users }: SessionParams) {
     this.channel = channel;
-    this.users = new Map();
+    this._users = new Map();
     this.addUsers(users);
   }
 
