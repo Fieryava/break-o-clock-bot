@@ -1,8 +1,9 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { CommandReturn } from "../../common/commands";
 import { axe } from "../../common/emojis";
-import Session from "../../common/sessions/session";
+import WorkSession from "../../common/sessions/workSession";
 import { startSession, getSession } from "../../common/sessions/sessionManager";
+import { minutesToMilliseconds } from "../../common/utils";
 
 export default class SplitSessionCommand extends Command {
   constructor(client: CommandoClient) {
@@ -22,7 +23,13 @@ export default class SplitSessionCommand extends Command {
     const existingSession = getSession(message.author);
     if (!existingSession) return message.say("No session to split you from; try starting a session first.");
 
-    startSession(new Session({ channel: message.channel, workMinutes: existingSession.workMinutes, breakMinutes: existingSession.breakMinutes, participants: [message.author], remainingTime: existingSession.remainingMinutes }));
+    startSession(new WorkSession({
+      channel: message.channel,
+      users: [message.author],
+      timeoutMs: minutesToMilliseconds(existingSession.remainingMinutes),
+      workMinutes: existingSession.workMinutes,
+      breakMinutes: existingSession.breakMinutes,
+    }));
     message.react(axe);
     return;
   }
