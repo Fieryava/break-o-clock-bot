@@ -26,9 +26,9 @@ export default class SplitSessionCommand extends Command {
     startSession(new WorkSession({
       channel: message.channel,
       users: [message.author],
-      timeoutMs: minutesToMilliseconds(existingSession.remainingMinutes),
-      workMinutes: existingSession.workMinutes,
-      breakMinutes: existingSession.breakMinutes,
+      timeoutMs: minutesToMilliseconds(existingSession.remainingMins),
+      workMins: existingSession.workMins,
+      breakMins: existingSession.breakMins,
     }));
     message.react(axe);
     return;

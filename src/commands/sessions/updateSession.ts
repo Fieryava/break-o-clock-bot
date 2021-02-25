@@ -1,7 +1,7 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { updateSession } from "../../common/sessions/sessionManager";
 import { WorkSessionInputs } from "../../common/sessions/workSession";
-import { breakMinutesArg, CommandReturn, workMinutesArg } from "../../common/commands";
+import { breakMinsArg, CommandReturn, workMinsArg } from "../../common/commands";
 import { okHand } from "../../common/emojis";
 
 export default class UpdateSessionCommand extends Command {
@@ -15,14 +15,14 @@ export default class UpdateSessionCommand extends Command {
       memberName: "update",
       description: "Updates your existing work session",
       args: [
-        workMinutesArg,
-        breakMinutesArg,
+        workMinsArg,
+        breakMinsArg,
       ],
     });
   }
 
-  run(message: CommandoMessage, { workMinutes, breakMinutes }: WorkSessionInputs): CommandReturn {
-    if (!updateSession(message.author, workMinutes, breakMinutes)) return message.say("No session to update.");
+  run(message: CommandoMessage, { workMins, breakMins }: WorkSessionInputs): CommandReturn {
+    if (!updateSession(message.author, workMins, breakMins)) return message.say("No session to update.");
 
     message.react(okHand);
     return;

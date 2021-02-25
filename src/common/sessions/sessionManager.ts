@@ -22,11 +22,11 @@ export const startSession = (newSession: WorkSession): void => {
   newSession.users.forEach(user => sessions.set(user.id, newSession));
 };
 
-export const updateSession = (target: Target, workMinutes: number, breakMinutes: number): boolean => {
+export const updateSession = (target: Target, workMins: number, breakMins: number): boolean => {
   const session = getSession(target);
   if (!session) return false;
 
-  session.update({ workMinutes, breakMinutes });
+  session.update({ workMins, breakMins });
   return true;
 };
 

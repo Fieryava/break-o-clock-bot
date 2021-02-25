@@ -2,15 +2,15 @@ import { ArgumentInfo, CommandoMessage } from "discord.js-commando";
 
 export type CommandReturn = Promise<null | CommandoMessage | CommandoMessage[]>;
 
-export const workMinutesArg: ArgumentInfo = {
-  key: "workMinutes",
+export const workMinsArg: ArgumentInfo = {
+  key: "workMins",
   type: "integer",
   prompt: "How many minutes will you work for?",
   default: 45,
 };
 
-export const breakMinutesArg: ArgumentInfo = {
-  key: "breakMinutes",
+export const breakMinsArg: ArgumentInfo = {
+  key: "breakMins",
   type: "integer",
   prompt: "How many minutes will you take a break for?",
   default: 15,

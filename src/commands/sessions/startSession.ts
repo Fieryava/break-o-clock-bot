@@ -1,7 +1,7 @@
 import { Command, CommandoClient, CommandoMessage } from "discord.js-commando";
 import { startSession } from "../../common/sessions/sessionManager";
 import WorkSession, { WorkSessionInputs } from "../../common/sessions/workSession";
-import { breakMinutesArg, CommandReturn, workMinutesArg } from "../../common/commands";
+import { breakMinsArg, CommandReturn, workMinsArg } from "../../common/commands";
 import { okHand } from "../../common/emojis";
 import { minutesToMilliseconds } from "../../common/utils";
 
@@ -18,20 +18,20 @@ export default class StartSessionCommand extends Command {
       memberName: "start",
       description: "Starts a new work session",
       args: [
-        workMinutesArg,
-        breakMinutesArg,
+        workMinsArg,
+        breakMinsArg,
       ],
     });
   }
 
   // TODO: Consider sending a message with time for initial timer.
-  run(message: CommandoMessage, { workMinutes, breakMinutes }: WorkSessionInputs): CommandReturn {
+  run(message: CommandoMessage, { workMins, breakMins }: WorkSessionInputs): CommandReturn {
     startSession(new WorkSession({
       channel: message.channel,
       users: message.author,
-      timeoutMs: minutesToMilliseconds(workMinutes),
-      workMinutes,
-      breakMinutes,
+      timeoutMs: minutesToMilliseconds(workMins),
+      workMins: workMins,
+      breakMins: breakMins,
     }));
     message.react(okHand);
     return;

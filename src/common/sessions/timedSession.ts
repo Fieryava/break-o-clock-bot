@@ -1,19 +1,20 @@
-import { millisecondsToMinutes, minutesToMilliseconds } from "../utils";
+import { millisecondsToMinutes } from "../utils";
 import Session, { SessionParams } from "./session";
 
 export interface TimedSessionParams extends SessionParams {
   timeoutMs: number;
 }
 
+// TODO: Consider supporting multiple time units. Could use a union type of strings "s" | "m" | "h".
 export default abstract class TimedSession extends Session {
   private timeout: NodeJS.Timeout;
   isPaused: boolean;
-  private targetTime: number;
-  private remainingTime: number;
-  get remainingMinutes(): number {
+  private targetTimestamp: number;
+  private remainingMs: number;
+  get remainingMins(): number {
     const time = this.isPaused
-      ? this.remainingTime
-      : this.targetTime - Date.now();
+      ? this.remainingMs
+      : this.targetTimestamp - Date.now();
     return millisecondsToMinutes(time);
   }
 
@@ -23,28 +24,27 @@ export default abstract class TimedSession extends Session {
     this.start(timeoutMs);
   }
 
-  // #region Starting and stopping
   /**
    * Start the timeout using time.
-   * @param time The timeout delay in milliseconds.
+   * @param timeoutMs The timeout delay in milliseconds.
    */
-  start(time: number): void {
+  start(timeoutMs: number): void {
     this.isPaused = false;
-    this.targetTime = Date.now() + time;
-    this.remainingTime = time;
-    this.timeout = setTimeout(() => this.timeUp(), time);
+    this.targetTimestamp = Date.now() + timeoutMs;
+    this.remainingMs = timeoutMs;
+    this.timeout = setTimeout(() => this.timeUp(), timeoutMs);
   }
 
   pause(): void {
     if (this.isPaused) return;
     this.isPaused = true;
-    this.remainingTime = this.targetTime - Date.now();
+    this.remainingMs = this.targetTimestamp - Date.now();
     this.stop();
   }
 
   unpause(): void {
     if (!this.isPaused) return;
-    this.start(this.remainingTime);
+    this.start(this.remainingMs);
   }
 
   stop(): void {
@@ -52,10 +52,9 @@ export default abstract class TimedSession extends Session {
   }
 
   end(): void {
+    super.end();
     this.stop();
-    this.users.clear();
   }
-  // #endregion
-  
+
   abstract timeUp(): void;
 }
