@@ -22,7 +22,13 @@ export default class UpdateSessionCommand extends Command {
   }
 
   run(message: CommandoMessage, { workMins, breakMins }: WorkSessionInputs): CommandReturn {
-    if (!updateSession(message.author, workMins, breakMins)) return message.say("No session to update.");
+    try {
+      if (!updateSession(message.author, workMins, breakMins)) return message.say("No session to update.");
+    } catch (error) {
+      if (error instanceof RangeError) {
+        return message.say(error.message);
+      }
+    }
 
     message.react(okHand);
     return;

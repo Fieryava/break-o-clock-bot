@@ -26,13 +26,18 @@ export default class StartSessionCommand extends Command {
 
   // TODO: Consider sending a message with time for initial timer.
   run(message: CommandoMessage, { workMins, breakMins }: WorkSessionInputs): CommandReturn {
-    startSession(new WorkSession({
-      channel: message.channel,
-      users: message.author,
-      timeoutMs: minutesToMilliseconds(workMins),
-      workMins: workMins,
-      breakMins: breakMins,
-    }));
+    try {
+      startSession(new WorkSession({
+        channel: message.channel,
+        users: message.author,
+        workMins: workMins,
+        breakMins: breakMins,
+      }));
+    } catch (error) {
+      if (error instanceof RangeError) {
+        return message.say("The work and break times must be greater than 0.");
+      }
+    }
     message.react(okHand);
     return;
   }

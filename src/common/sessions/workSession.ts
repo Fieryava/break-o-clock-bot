@@ -1,17 +1,22 @@
 import { getRandomItem, millisecondsToMinutes, minutesToMilliseconds, minutesToStatus } from "../utils";
-import { TimedSessionParams } from "./timedSession";
-import TimedSession from "./timedSession";
+import Timer from "../timer";
+import Session, { SessionParams } from "./session";
 
 export interface WorkSessionInputs {
   workMins: number;
   breakMins: number;
+  timeoutMs?: number;
 }
 
-export interface WorkSessionParams extends TimedSessionParams, WorkSessionInputs { }
+export interface WorkSessionParams extends WorkSessionInputs, SessionParams { }
 
 // TODO: Snooze
 // TODO: Consider allowing users to join sessions with reactions.
-export default class WorkSession extends TimedSession {
+export default class WorkSession extends Session {
+  private _timer: Timer;
+  public get timer(): Timer {
+    return this._timer;
+  }
   private workMs: number;
   public get workMins(): number {
     return millisecondsToMinutes(this.workMs);
@@ -21,19 +26,6 @@ export default class WorkSession extends TimedSession {
     return millisecondsToMinutes(this.breakMs);
   }
   public isOnBreak: boolean;
-
-  constructor({ workMins, breakMins, ...rest }: WorkSessionParams) {
-    super(rest);
-
-    this.workMs = minutesToMilliseconds(workMins);
-    this.breakMs = minutesToMilliseconds(breakMins);
-    this.isOnBreak = false;
-  }
-
-  update({ workMins, breakMins }: WorkSessionInputs): void {
-    this.workMs = minutesToMilliseconds(workMins);
-    this.breakMs = minutesToMilliseconds(breakMins);
-  }
 
   private get breakString(): string {
     const vals = [
@@ -53,6 +45,26 @@ export default class WorkSession extends TimedSession {
     return this.prependUsers(getRandomItem(vals));
   }
 
+  constructor({ workMins, breakMins, timeoutMs, ...rest }: WorkSessionParams) {
+    super(rest);
+
+    this.workMs = minutesToMilliseconds(workMins);
+    this.breakMs = minutesToMilliseconds(breakMins);
+    this.isOnBreak = false;
+    this._timer = new Timer();
+    this.start(timeoutMs ?? this.workMs);
+  }
+
+  update({ workMins, breakMins }: WorkSessionInputs): void {
+    if (workMins <= 0 || breakMins <= 0) throw new RangeError("Work and break times must be greater than 0.");
+    this.workMs = minutesToMilliseconds(workMins);
+    this.breakMs = minutesToMilliseconds(breakMins);
+  }
+
+  private start(timeoutMs: number): void {
+    this.timer.start(() => this.timeUp(), timeoutMs);
+  }
+
   timeUp(): void {
     this.isOnBreak = !this.isOnBreak;
 
@@ -64,12 +76,12 @@ export default class WorkSession extends TimedSession {
   }
 
   flip(): void {
-    this.stop();
+    this.timer.stop();
     this.timeUp();
   }
 
   toString(): string {
-    return `${this.isPaused ? "Paused. " : ""}${minutesToStatus(this.remainingMins)} until ${this.isOnBreak ? "work time." : "break time."}
+    return `${this._timer.isPaused ? "Paused. " : ""}${minutesToStatus(this.timer.remainingMins)} until ${this.isOnBreak ? "work time." : "break time."}
 Work time: ${this.workMins} min
 Break time: ${this.breakMins} min
 Participants: ${this.usersString}`;

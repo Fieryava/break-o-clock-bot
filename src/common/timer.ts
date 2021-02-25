@@ -1,13 +1,9 @@
-import { millisecondsToMinutes } from "../utils";
-import Session, { SessionParams } from "./session";
-
-export interface TimedSessionParams extends SessionParams {
-  timeoutMs: number;
-}
+import { millisecondsToMinutes } from "./utils";
 
 // TODO: Consider supporting multiple time units. Could use a union type of custom classes Milliseconds | Seconds | Minutes | Hours.
-export default abstract class TimedSession extends Session {
+export default class Timer {
   private timeout: NodeJS.Timeout;
+  private callback: () => void;
   private _isPaused: boolean;
   public get isPaused(): boolean {
     return this._isPaused;
@@ -21,21 +17,16 @@ export default abstract class TimedSession extends Session {
     return millisecondsToMinutes(time);
   }
 
-  public constructor({ timeoutMs, ...rest }: TimedSessionParams) {
-    super(rest);
-    if (timeoutMs <= 0) throw new RangeError("Remaining time must be greater than 0.");
-    this.start(timeoutMs);
-  }
-
   /**
    * Start the timeout using time.
    * @param timeoutMs The timeout delay in milliseconds.
    */
-  public start(timeoutMs: number): void {
+  public start(callback: () => void, timeoutMs: number): void {
+    if (timeoutMs <= 0) throw new RangeError("Remaining time must be greater than 0.");
+    this.callback = callback;
     this._isPaused = false;
     this.targetTimestamp = Date.now() + timeoutMs;
-    this.remainingMs = timeoutMs;
-    this.timeout = setTimeout(() => this.timeUp(), timeoutMs);
+    this.timeout = setTimeout(this.callback, timeoutMs);
   }
 
   public pause(): void {
@@ -47,17 +38,10 @@ export default abstract class TimedSession extends Session {
 
   public unpause(): void {
     if (!this.isPaused) return;
-    this.start(this.remainingMs);
+    this.start(this.callback, this.remainingMs);
   }
 
   public stop(): void {
     clearTimeout(this.timeout);
   }
-
-  public end(): void {
-    super.end();
-    this.stop();
-  }
-
-  public abstract timeUp(): void;
 }

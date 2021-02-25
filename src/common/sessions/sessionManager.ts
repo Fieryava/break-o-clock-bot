@@ -17,9 +17,10 @@ export const getSession = (target: Target): WorkSession => {
   return "id" in target ? sessions.get(target.id) : target;
 };
 
-export const startSession = (newSession: WorkSession): void => {
+export const startSession = (newSession: WorkSession): WorkSession => {
   removeFromSessions(newSession.users);
   newSession.users.forEach(user => sessions.set(user.id, newSession));
+  return newSession;
 };
 
 export const updateSession = (target: Target, workMins: number, breakMins: number): boolean => {
@@ -62,7 +63,7 @@ export const pauseSession = (target: Target): boolean => {
   const targetSession = getSession(target);
   if (!targetSession) return false;
 
-  targetSession.pause();
+  targetSession.timer.pause();
   return true;
 };
 
@@ -70,6 +71,6 @@ export const unpauseSession = (target: Target): boolean => {
   const targetSession = getSession(target);
   if (!targetSession) return false;
 
-  targetSession.unpause();
+  targetSession.timer.unpause();
   return true;
 };
